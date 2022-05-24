@@ -1,0 +1,167 @@
+-- 1
+SELECT
+    count(id)
+FROM
+    stops;
+
+-- 2
+SELECT
+    id
+FROM
+    stops
+WHERE
+    name = 'Craiglockhart';
+
+-- 3
+SELECT
+    id,
+    name
+FROM
+    stops
+    JOIN route ON id = STOP
+WHERE
+    num = 4
+    AND company = 'LRT'
+ORDER BY
+    pos;
+
+-- 4
+SELECT
+    company,
+    num,
+    COUNT(*)
+FROM
+    route
+WHERE
+    STOP = 149
+    OR STOP = 53
+GROUP BY
+    company,
+    num
+HAVING
+    count(*) = 2;
+
+-- 5
+SELECT
+    a.company,
+    a.num,
+    a.stop,
+    b.stop
+FROM
+    route a
+    JOIN route b ON (
+        a.company = b.company
+        AND a.num = b.num
+    )
+WHERE
+    a.stop = 53
+    AND b.stop = 149;
+
+-- 6
+SELECT
+    a.company,
+    a.num,
+    stopa.name,
+    stopb.name
+FROM
+    route a
+    JOIN route b ON (
+        a.company = b.company
+        AND a.num = b.num
+    )
+    JOIN stops stopa ON (a.stop = stopa.id)
+    JOIN stops stopb ON (b.stop = stopb.id)
+WHERE
+    stopa.name = 'Craiglockhart'
+    AND stopb.name = 'London Road';
+
+-- 7
+SELECT
+    DISTINCT a.company,
+    a.num
+FROM
+    route a
+    JOIN route b ON (
+        a.company = b.company
+        AND a.num = b.num
+    )
+WHERE
+    a.stop = 115
+    AND b.stop = 137;
+
+-- 8
+SELECT
+    a.company,
+    a.num
+FROM
+    route a
+    JOIN route b ON (
+        a.company = b.company
+        AND a.num = b.num
+    )
+    JOIN stops stopa ON (a.stop = stopa.id)
+    JOIN stops stopb ON (b.stop = stopb.id)
+WHERE
+    stopa.name = 'Craiglockhart'
+    AND stopb.name = 'Tollcross';
+
+-- 9
+SELECT
+    stopb.name,
+    a.company,
+    a.num
+FROM
+    route a
+    JOIN route b ON (
+        a.company = b.company
+        AND a.num = b.num
+    )
+    JOIN stops stopa ON (a.stop = stopa.id)
+    JOIN stops stopb ON (b.stop = stopb.id)
+WHERE
+    stopa.name = 'Craiglockhart';
+
+-- 10
+SELECT
+    first_bus.num,
+    first_bus.company,
+    first_bus.name,
+    second_bus.num,
+    second_bus.company
+FROM
+    (
+        SELECT
+            a.num,
+            a.company,
+            stopb.name
+        FROM
+            route a
+            JOIN route b ON (
+                a.company = b.company
+                AND a.num = b.num
+            )
+            JOIN stops stopa ON (a.stop = stopa.id)
+            JOIN stops stopb ON (b.stop = stopb.id)
+        WHERE
+            stopa.name = 'Craiglockhart'
+    ) AS first_bus
+    JOIN (
+        SELECT
+            b.num,
+            b.company,
+            stopa.name
+        FROM
+            route a
+            JOIN route b ON (
+                a.company = b.company
+                AND a.num = b.num
+            )
+            JOIN stops stopa ON (a.stop = stopa.id)
+            JOIN stops stopb ON (b.stop = stopb.id)
+        WHERE
+            stopb.name = 'Lochend'
+    ) AS second_bus ON first_bus.name = second_bus.name
+ORDER BY
+    first_bus.num,
+    first_bus.name,
+    second_bus.num;
